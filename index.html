@@ -709,31 +709,32 @@ body {
   padding: 0 16px 0 20px;
 }
 .trip-title {
-  font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
+  font-size: 11px; font-weight: 400; letter-spacing: 2.5px;
   text-transform: uppercase; color: #0A0A0A;
+  cursor: pointer; background: none; border: none; font-family: inherit;
+  flex-shrink: 0;
 }
 .header-date {
-  font-size: 11px; font-weight: 500; letter-spacing: 1.5px;
+  font-size: 10px; font-weight: 400; letter-spacing: 1.5px;
   text-transform: uppercase; color: #888;
 }
 .header-right { display: flex; align-items: center; gap: 14px; }
 
-/* Hamburger — mobile only */
-.header-menu-btn {
-  background: none; border: none; cursor: pointer; padding: 8px 4px;
-  display: flex; flex-direction: column; justify-content: center; gap: 5px;
-}
-.header-menu-btn span {
-  display: block; width: 18px; height: 1.5px; background: #0A0A0A;
-  transition: transform 0.25s, opacity 0.25s;
-  transform-origin: center;
-}
-.header-menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-.header-menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-.header-menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+/* Hamburger — oculto (mantido para compatibilidade) */
+.header-menu-btn { display: none; }
 
-/* Desktop nav — hidden on mobile */
-.header-desktop-nav { display: none; }
+/* Nav sempre visível no header */
+.header-desktop-nav {
+  display: flex; align-items: center; gap: 20px; flex: 1; justify-content: flex-end;
+}
+.header-desktop-nav button {
+  background: none; border: none; cursor: pointer; font-family: inherit;
+  font-size: 9px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase;
+  color: #AAA; padding: 4px 0;
+  border-bottom: 1.5px solid transparent; transition: color 0.15s, border-color 0.15s;
+}
+.header-desktop-nav button.active,
+.header-desktop-nav button:hover { color: #0A0A0A; border-bottom-color: #0A0A0A; }
 
 /* ─── FULLPAGE MENU (mobile) ─── */
 .fullpage-menu {
@@ -823,17 +824,8 @@ body {
   }
   #day-slide-content { max-width: 860px; margin: 0 auto; }
 
-  .header-desktop-nav {
-    display: flex; align-items: center; gap: 32px;
-  }
-  .header-desktop-nav button {
-    background: none; border: none; cursor: pointer; font-family: inherit;
-    font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    color: #AAA; padding: 4px 0;
-    border-bottom: 1.5px solid transparent; transition: color 0.15s, border-color 0.15s;
-  }
-  .header-desktop-nav button.active,
-  .header-desktop-nav button:hover { color: #0A0A0A; border-bottom-color: #0A0A0A; }
+  .header-desktop-nav { gap: 32px; }
+  .header-desktop-nav button { font-size: 10px; }
 }
 
 /* ─── BOTTOM NAV ─── */
@@ -1110,7 +1102,7 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
   padding: 12px 14px;
   font-size: 14px; font-weight: 600; line-height: 1.4;
 }
-.day-act-desc { font-size: 12px; color: #888; font-weight: 400; margin-top: 3px; line-height: 1.5; }
+.day-act-desc { font-size: 13px; color: #888; font-weight: 400; margin-top: 3px; line-height: 1.5; }
 .day-tip-row {
   padding: 14px 16px; border-bottom: 1px solid #DDD9D3;
   background: #E8E4DF;
@@ -1139,7 +1131,7 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
 .day-summary-text {
   font-size: 14px; color: #0A0A0A; line-height: 1.65; font-weight: 400;
 }
-.day-act-title { font-size: 14px; font-weight: 500; line-height: 1.3; }
+.day-act-title { font-size: 15px; font-weight: 500; line-height: 1.3; }
 .act-ext-link {
   font-size: 10px; color: #888; text-decoration: none; font-weight: 700;
   padding: 1px 4px; border: 1px solid #DDD9D3; border-radius: 3px;
@@ -1382,12 +1374,12 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
 
 <!-- ─── HEADER ─── -->
 <header class="app-header">
-  <div class="trip-title">JAPÃO 旅</div>
+  <button class="trip-title" onclick="switchView('overview')" aria-label="Início">JAPÃO 旅</button>
   <nav class="header-desktop-nav">
     <button onclick="switchView('overview')" id="dnav-overview" class="active">Plano</button>
-    <button onclick="switchView('map')" id="dnav-map">Mapa</button>
     <button onclick="switchView('cidades')" id="dnav-cidades">Guia</button>
-    <button onclick="switchView('reservas')" id="dnav-reservas">Docs</button>
+    <button onclick="switchToDicas()" id="dnav-dicas">Dicas</button>
+    <button onclick="switchView('reservas')" id="dnav-reservas">Reservas</button>
   </nav>
   <div class="header-right">
     <div class="header-date" id="header-date"></div>
@@ -1408,16 +1400,16 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
       <span class="fullpage-menu-item-label">Plano</span>
       <span class="fullpage-menu-item-arrow">→</span>
     </button>
-    <button class="fullpage-menu-item" id="fmenu-map" onclick="switchView('map');toggleFullMenu()">
-      <span class="fullpage-menu-item-label">Mapa</span>
-      <span class="fullpage-menu-item-arrow">→</span>
-    </button>
     <button class="fullpage-menu-item" id="fmenu-cidades" onclick="switchView('cidades');toggleFullMenu()">
       <span class="fullpage-menu-item-label">Guia</span>
       <span class="fullpage-menu-item-arrow">→</span>
     </button>
+    <button class="fullpage-menu-item" id="fmenu-dicas" onclick="switchToDicas();toggleFullMenu()">
+      <span class="fullpage-menu-item-label">Dicas</span>
+      <span class="fullpage-menu-item-arrow">→</span>
+    </button>
     <button class="fullpage-menu-item" id="fmenu-reservas" onclick="switchView('reservas');toggleFullMenu()">
-      <span class="fullpage-menu-item-label">Docs</span>
+      <span class="fullpage-menu-item-label">Reservas</span>
       <span class="fullpage-menu-item-arrow">→</span>
     </button>
   </div>
@@ -1483,9 +1475,9 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
 <!-- ─── BOTTOM NAV ─── -->
 <nav class="bottom-nav">
   <button onclick="switchView('overview')" id="bnav-overview" class="active">Plano</button>
-  <button onclick="switchView('map')" id="bnav-map">Mapa</button>
   <button onclick="switchView('cidades')" id="bnav-cidades">Guia</button>
-  <button onclick="switchView('reservas')" id="bnav-reservas">Docs</button>
+  <button onclick="switchToDicas()" id="bnav-dicas">Dicas</button>
+  <button onclick="switchView('reservas')" id="bnav-reservas">Reservas</button>
 </nav>
 
 <!-- ─── ADD SHEET ─── -->
@@ -2124,22 +2116,37 @@ function statusLabel(s) {
 function switchView(name) {
   currentView = name;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
+  const viewEl = document.getElementById('view-' + name);
+  if (viewEl) viewEl.classList.add('active');
 
-  // Update bottom nav, desktop nav, and fullpage menu
-  ['overview','map','cidades','reservas'].forEach(n => {
+  // Sincronizar todos os navs — dicas aponta para cidades
+  const activeNav = name === 'cidades' && currentCityGuide === 'Dicas' ? 'dicas' : name;
+  ['overview','cidades','dicas','reservas'].forEach(n => {
     const bnav = document.getElementById('bnav-' + n);
-    if (bnav) bnav.classList.toggle('active', n === name);
+    if (bnav) bnav.classList.toggle('active', n === activeNav);
     const dnav = document.getElementById('dnav-' + n);
-    if (dnav) dnav.classList.toggle('active', n === name);
+    if (dnav) dnav.classList.toggle('active', n === activeNav);
     const fmenu = document.getElementById('fmenu-' + n);
-    if (fmenu) fmenu.classList.toggle('active-nav', n === name);
+    if (fmenu) fmenu.classList.toggle('active-nav', n === activeNav);
   });
 
   if (name === 'overview') renderOverview();
-  if (name === 'map') renderMapView();
   if (name === 'reservas') renderReservas(currentReservasTab);
   if (name === 'cidades') renderCidades();
+}
+
+function switchToDicas() {
+  switchView('cidades');
+  switchCityGuide('Dicas');
+  // Marcar Dicas como ativo nos navs
+  ['overview','cidades','dicas','reservas'].forEach(n => {
+    const bnav = document.getElementById('bnav-' + n);
+    if (bnav) bnav.classList.toggle('active', n === 'dicas');
+    const dnav = document.getElementById('dnav-' + n);
+    if (dnav) dnav.classList.toggle('active', n === 'dicas');
+    const fmenu = document.getElementById('fmenu-' + n);
+    if (fmenu) fmenu.classList.toggle('active-nav', n === 'dicas');
+  });
 }
 
 function toggleFullMenu() {
