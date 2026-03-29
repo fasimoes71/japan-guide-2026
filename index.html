@@ -857,6 +857,29 @@ body {
   display: none;
 }
 
+/* ─── OVERVIEW HERO ─── */
+.overview-hero-wrap {
+  position: relative; width: 100%; height: 220px; overflow: hidden;
+  background: #0A0A0A;
+}
+.overview-hero-img {
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0.72; display: block;
+}
+.overview-hero-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
+  padding: 20px 20px 22px;
+}
+.overview-hero-title {
+  font-size: 32px; font-weight: 400; letter-spacing: -1px;
+  color: #F0EDE8; line-height: 1;
+}
+.overview-hero-sub {
+  font-size: 10px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(240,237,232,0.6); margin-top: 4px;
+}
+
 /* ─── VIEWS ─── */
 .view { display: none; }
 .view.active { display: block; }
@@ -1477,6 +1500,13 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
 
 <!-- VIEW 1: VISÃO GERAL -->
 <div class="view active" id="view-overview">
+  <div class="overview-hero-wrap">
+    <img class="overview-hero-img" id="overview-hero-img" src="fotos/japan/tokyo home 1.jpg" alt="Tokyo">
+    <div class="overview-hero-overlay">
+      <div class="overview-hero-title">JAPÃO 旅</div>
+      <div class="overview-hero-sub">ABR 2026</div>
+    </div>
+  </div>
   <div id="overview-content"></div>
 </div>
 
@@ -2884,7 +2914,35 @@ function renderCidades() {
 }
 
 // ═══════════════════════════════════════
-// PHOTO SYSTEM (Wikipedia API)
+// ═══════════════════════════════════════
+// LOCAL PHOTO MAP  (fotos/japan/)
+// ═══════════════════════════════════════
+const DAY_PHOTOS = {
+  '07/04': 'tokyo home.jpg',
+  '08/04': 'teamlab.jpg',
+  '09/04': 'akakusa.jpg',
+  '10/04': 'ueno.jpg',
+  '11/04': 'SHINJUKU .jpg',
+  '12/04': 'ODAIBA.jpg',
+  '13/04': 'HAKONE.jpg',
+  '14/04': 'RIO KAMO.jpg',
+  '15/04': 'NIJO CASTLE.jpg',
+  '16/04': 'fushimi.jpg',
+  '17/04': 'KIYOMIZU.jpg',
+  '18/04': 'NARA park.jpg',
+  '19/04': 'osaka.jpg',
+  '20/04': 'KAIYUKAN AQUARIUM.jpg',
+  '21/04': 'Shinsekai.jpg',
+  '22/04': 'UNIVERSAL STUDIOS JAPAN.jpg',
+  '23/04': 'UNIVERSAL STUDIOS JAPAN1.jpg',
+  '24/04': 'museu da narrativa.jpg',
+  '25/04': 'haneda.jpg',
+};
+
+const HOME_PHOTO = 'fotos/japan/tokyo home 1.jpg';
+
+// ═══════════════════════════════════════
+// PHOTO SYSTEM (Wikipedia API fallback)
 // ═══════════════════════════════════════
 const photoCache = {};
 
@@ -3008,7 +3066,18 @@ async function loadDayHeroPhoto(d) {
   const credit = document.getElementById('day-hero-credit');
   if (!wrap || !img) return;
 
-  // Try each activity in the day until we find a Wikipedia photo
+  // Try local photo first
+  const localFile = DAY_PHOTOS[d.date];
+  if (localFile) {
+    const localUrl = 'fotos/japan/' + localFile;
+    img.onload = () => { img.classList.add('loaded'); if (placeholder) placeholder.style.display = 'none'; };
+    img.onerror = () => { img.src = ''; }; // silently fail, no credit
+    img.src = localUrl;
+    if (credit) credit.textContent = '';
+    return;
+  }
+
+  // Fallback: try each activity in the day until we find a Wikipedia photo
   for (const act of d.activities) {
     const text = typeof act === 'string' ? act : act.t;
     const article = findWikiArticle(text);

@@ -1,5 +1,29 @@
-const CACHE = 'japao-2026-v2';
-const ASSETS = ['/', '/index.html'];
+const CACHE = 'japao-2026-v3';
+const ASSETS = [
+  '/', '/index.html',
+  'fotos/japan/tokyo home.jpg',
+  'fotos/japan/tokyo home 1.jpg',
+  'fotos/japan/tokyo.jpg',
+  'fotos/japan/teamlab.jpg',
+  'fotos/japan/akakusa.jpg',
+  'fotos/japan/ueno.jpg',
+  'fotos/japan/SHINJUKU .jpg',
+  'fotos/japan/ODAIBA.jpg',
+  'fotos/japan/HAKONE.jpg',
+  'fotos/japan/RIO KAMO.jpg',
+  'fotos/japan/NIJO CASTLE.jpg',
+  'fotos/japan/fushimi.jpg',
+  'fotos/japan/KIYOMIZU.jpg',
+  'fotos/japan/NARA park.jpg',
+  'fotos/japan/osaka.jpg',
+  'fotos/japan/KAIYUKAN AQUARIUM.jpg',
+  'fotos/japan/Shinsekai.jpg',
+  'fotos/japan/UNIVERSAL STUDIOS JAPAN.jpg',
+  'fotos/japan/UNIVERSAL STUDIOS JAPAN1.jpg',
+  'fotos/japan/museu da narrativa.jpg',
+  'fotos/japan/haneda.jpg',
+  'fotos/japan/osaka tokyo.jpg',
+];
 
 // Instala e cacheia o app
 self.addEventListener('install', e => {
