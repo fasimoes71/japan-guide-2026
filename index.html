@@ -816,8 +816,7 @@ body {
   #overview-view, #reservas-view, #cidades-view, #map-view {
     max-width: 860px; margin: 0 auto;
   }
-  /* Day slide full-screen mas conteúdo centralizado */
-  .day-slide { left: 0; right: 0; transform: none; max-width: none; }
+  /* Day slide: mantém right:-100%/right:0 normal, só centraliza conteúdo */
   .day-slide-header {
     padding-left: max(20px, calc((100vw - 860px) / 2));
     padding-right: max(20px, calc((100vw - 860px) / 2));
