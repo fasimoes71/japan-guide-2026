@@ -1,4 +1,4 @@
-const CACHE = 'japao-2026-v1';
+const CACHE = 'japao-2026-v2';
 const ASSETS = ['/', '/index.html'];
 
 // Instala e cacheia o app

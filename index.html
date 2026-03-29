@@ -714,7 +714,7 @@ body {
   cursor: pointer; background: none; border: none; font-family: inherit;
   flex-shrink: 0;
 }
-.header-date { display: none; }
+.header-date { display: none !important; }
 .header-right { display: flex; align-items: center; gap: 14px; }
 
 /* Hamburger */
@@ -808,8 +808,6 @@ body {
 @media (min-width: 768px) {
   body { padding-bottom: 0; }
   body { padding-top: 56px; }
-  .header-menu-btn { display: none; }
-  .fullpage-menu { display: none !important; }
   .bottom-nav { display: none; }
 
   /* Header centralizado com max-width */
@@ -2445,6 +2443,25 @@ function saveNewActivity() {
 }
 
 // ═══════════════════════════════════════
+// HOTEL LOOKUP FOR DAY
+// ═══════════════════════════════════════
+function getHotelForDay(dayDate) {
+  // dayDate is "DD/MM". Find the hotel where checkin <= dayDate < checkout
+  function toNum(ddmm) {
+    const p = (ddmm || '').split('/');
+    const d = parseInt(p[0], 10) || 0;
+    const m = parseInt(p[1], 10) || 0;
+    return m * 100 + d;
+  }
+  const n = toNum(dayDate);
+  return hotels.find(h => {
+    const ci = toNum(h.checkin);
+    const co = toNum(h.checkout);
+    return n >= ci && n < co;
+  }) || null;
+}
+
+// ═══════════════════════════════════════
 // DAY DETAIL
 // ═══════════════════════════════════════
 function openDayDetail(idx) {
@@ -2538,18 +2555,17 @@ function renderDayDetail(idx) {
   // Day route button (Google Maps transit/metro)
   const stopList = d.activities
     .filter(a => typeof a === 'object' && a.t && !a.t.startsWith('Saída') && !a.t.startsWith('Almoço') && !a.t.startsWith('Jantar') && !a.t.startsWith('Check') && !a.t.startsWith('Voo') && !a.t.startsWith('Pausa'));
-  if (stopList.length >= 2) {
-    const origin = encodeURIComponent(stopList[0].t + ' Japan');
+  const dayHotel = getHotelForDay(d.date);
+  if (stopList.length >= 1) {
+    const hotelOrigin = dayHotel ? encodeURIComponent(dayHotel.name + ' Japan') : null;
+    const origin = hotelOrigin || encodeURIComponent(stopList[0].t + ' Japan');
     const destination = encodeURIComponent(stopList[stopList.length - 1].t + ' Japan');
-    const waypoints = stopList.slice(1, -1).map(a => encodeURIComponent(a.t + ' Japan')).join('|');
+    // if hotel is origin, all stops are waypoints; otherwise first stop is origin and rest are waypoints+destination
+    const waypointList = hotelOrigin ? stopList.slice(0, -1) : stopList.slice(1, -1);
+    const waypoints = waypointList.map(a => encodeURIComponent(a.t + ' Japan')).join('|');
     const routeUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? `&waypoints=${waypoints}` : ''}&travelmode=transit`;
     html += `<a href="${routeUrl}" target="_blank" rel="noopener" class="day-route-btn">
       🚇 Ver Rota do Dia no Google Maps (metrô)
-    </a>`;
-  } else if (stopList.length === 1) {
-    const q = encodeURIComponent(stopList[0].t + ' Japan');
-    html += `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener" class="day-route-btn">
-      🗺 Ver no Google Maps
     </a>`;
   }
 
