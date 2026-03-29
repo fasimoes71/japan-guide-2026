@@ -801,11 +801,29 @@ body {
 /* ─── DESKTOP overrides ─── */
 @media (min-width: 768px) {
   body { padding-bottom: 0; }
-  .app-header { height: 56px; padding: 0 40px; }
   body { padding-top: 56px; }
   .header-menu-btn { display: none; }
   .fullpage-menu { display: none !important; }
   .bottom-nav { display: none; }
+
+  /* Header centralizado com max-width */
+  /* Centrar conteúdo em 860px com padding dinâmico */
+  .app-header {
+    height: 56px;
+    padding-left: max(40px, calc((100vw - 860px) / 2));
+    padding-right: max(40px, calc((100vw - 860px) / 2));
+  }
+  #overview-view, #reservas-view, #cidades-view, #map-view {
+    max-width: 860px; margin: 0 auto;
+  }
+  /* Day slide full-screen mas conteúdo centralizado */
+  .day-slide { left: 0; right: 0; transform: none; max-width: none; }
+  .day-slide-header {
+    padding-left: max(20px, calc((100vw - 860px) / 2));
+    padding-right: max(20px, calc((100vw - 860px) / 2));
+  }
+  #day-slide-content { max-width: 860px; margin: 0 auto; }
+
   .header-desktop-nav {
     display: flex; align-items: center; gap: 32px;
   }
@@ -1021,7 +1039,7 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
 }
 .day-slide-back::before { content: '←'; font-size: 14px; }
 .day-slide-datestr {
-  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  font-size: 10px; font-weight: 400; letter-spacing: 1.5px;
   text-transform: uppercase; color: #888;
 }
 .day-slide-nav { display: flex; gap: 8px; }
@@ -1209,7 +1227,7 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1px;
 }
 .dp-today .dp-date { border-right-color: #2A2A2A; }
-.dp-day { font-size: 24px; font-weight: 900; letter-spacing: -1px; line-height: 1; }
+.dp-day { font-size: 24px; font-weight: 400; letter-spacing: -1px; line-height: 1; }
 .dp-month { font-size: 8px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: 1px; }
 .dp-wd { font-size: 8px; color: #AAA; text-transform: uppercase; letter-spacing: 0.5px; }
 .dp-content { flex: 1; padding: 14px 14px 14px 16px; min-width: 0; }
@@ -1232,7 +1250,7 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
   padding: 16px 10px; border-right: 1px solid #333;
   display: flex; flex-direction: column; gap: 2px; align-items: center; justify-content: flex-start;
 }
-.day-hero-num { font-size: 48px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+.day-hero-num { font-size: 48px; font-weight: 400; letter-spacing: -2px; line-height: 1; }
 .day-hero-month { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 .day-hero-wd { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
 .day-hero-body { padding: 16px; }
