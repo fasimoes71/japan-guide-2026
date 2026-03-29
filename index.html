@@ -900,10 +900,10 @@ body {
   padding: 14px 12px; border-right: 1px solid #DDD9D3;
   display: flex; flex-direction: column; gap: 3px;
 }
-.b-date-main { font-size: 15px; font-weight: 900; letter-spacing: -0.3px; }
+.b-date-main { font-size: 15px; font-weight: 400; letter-spacing: -0.3px; }
 .b-date-range { font-size: 11px; color: #888; }
 .b-status {
-  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  font-size: 9px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 1px; margin-top: auto;
 }
 .b-status.booked { color: #0A0A0A; }
@@ -911,11 +911,11 @@ body {
 .b-status.idea { color: #AAA; }
 .b-content { padding: 14px; }
 .b-type {
-  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  font-size: 9px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 1.5px; color: #888; margin-bottom: 4px;
 }
-.b-name { font-size: 17px; font-weight: 500; margin-bottom: 8px; line-height: 1.2; }
-.b-code { font-size: 36px; font-weight: 900; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; }
+.b-name { font-size: 17px; font-weight: 400; margin-bottom: 8px; line-height: 1.2; }
+.b-code { font-size: 28px; font-weight: 400; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; }
 .b-detail { font-size: 12px; color: #888; line-height: 1.5; }
 .b-detail a { color: #0A0A0A; }
 
@@ -2459,7 +2459,7 @@ function renderReservas(tab) {
         <div class="b-content">
           <div class="b-type">ACCOMMODATION</div>
           <div class="b-name">${h.name}</div>
-          <div class="b-code">${h.nights}N</div>
+          <div class="b-code">${h.nights} ${h.nights === 1 ? 'noite' : 'noites'}</div>
           <div class="b-detail">
             ${h.note || ''}<br>
             ${h.price !== '—' ? h.price : ''}
