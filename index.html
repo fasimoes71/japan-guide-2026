@@ -714,19 +714,14 @@ body {
   cursor: pointer; background: none; border: none; font-family: inherit;
   flex-shrink: 0;
 }
-.header-date {
-  font-size: 10px; font-weight: 400; letter-spacing: 1.5px;
-  text-transform: uppercase; color: #888;
-}
+.header-date { display: none; }
 .header-right { display: flex; align-items: center; gap: 14px; }
 
 /* Hamburger — oculto (mantido para compatibilidade) */
 .header-menu-btn { display: none; }
 
 /* Nav sempre visível no header */
-.header-desktop-nav {
-  display: flex; align-items: center; gap: 20px; flex: 1; justify-content: flex-end;
-}
+.header-desktop-nav { display: none; }
 .header-desktop-nav button {
   background: none; border: none; cursor: pointer; font-family: inherit;
   font-size: 9px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase;
@@ -824,8 +819,7 @@ body {
   }
   #day-slide-content { max-width: 860px; margin: 0 auto; }
 
-  .header-desktop-nav { gap: 32px; }
-  .header-desktop-nav button { font-size: 10px; }
+  /* sem nav no header — bottom nav cuida disso */
 }
 
 /* ─── BOTTOM NAV ─── */
