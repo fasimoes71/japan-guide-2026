@@ -872,8 +872,8 @@ body {
   display: flex; align-items: flex-start;
 }
 .g-value { padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; }
-.g-num { font-size: 56px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
-.g-num-md { font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+.g-num { font-size: 56px; font-weight: 400; line-height: 1; letter-spacing: -2px; }
+.g-num-md { font-size: 32px; font-weight: 400; line-height: 1; letter-spacing: -1px; }
 .g-sub { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
 .g-text { font-size: 15px; font-weight: 400; }
 .g-muted { font-size: 13px; color: #888; margin-top: 2px; }
@@ -1247,9 +1247,61 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
 .day-hero-month { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 .day-hero-wd { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
 .day-hero-body { padding: 16px; }
-.day-hero-title { font-size: 18px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.3px; }
+.day-hero-title { font-size: 18px; font-weight: 500; line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.3px; }
 .day-hero-summary { font-size: 12px; color: #AAA; line-height: 1.6; margin-bottom: 10px; font-weight: 400; }
 .day-hero-main { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+/* ─── FLIGHT MODAL ─── */
+.flight-modal-overlay {
+  position: fixed; inset: 0; z-index: 400;
+  background: rgba(0,0,0,0.5); opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.flight-modal-overlay.open { opacity: 1; pointer-events: all; }
+.flight-modal {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 401;
+  background: #F0EDE8; border-radius: 16px 16px 0 0;
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  max-height: 80vh; display: flex; flex-direction: column;
+}
+.flight-modal.open { transform: translateY(0); }
+.flight-modal-handle {
+  width: 36px; height: 4px; background: #DDD9D3; border-radius: 2px;
+  margin: 12px auto 0; flex-shrink: 0;
+}
+.flight-modal-header {
+  padding: 16px 20px 12px; border-bottom: 1px solid #DDD9D3;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.flight-modal-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.flight-modal-close {
+  background: none; border: none; cursor: pointer;
+  font-size: 20px; color: #888; line-height: 1; padding: 0 4px;
+}
+.flight-modal-body { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.flight-ticket {
+  padding: 16px 20px; border-bottom: 1px solid #DDD9D3;
+}
+.flight-ticket-route {
+  font-size: 20px; font-weight: 400; letter-spacing: -0.5px; margin-bottom: 2px;
+}
+.flight-ticket-meta {
+  font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 12px;
+}
+.flight-ticket-seats {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.flight-seat {
+  background: #0A0A0A; color: #F0EDE8;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+  padding: 5px 10px; border-radius: 4px;
+}
+.flight-seat-label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+.flight-ticket-link {
+  display: inline-block; margin-top: 10px;
+  font-size: 10px; color: #0A0A0A; letter-spacing: 1px; text-transform: uppercase;
+  text-decoration: none; border-bottom: 1px solid #0A0A0A;
+}
 
 /* ─── CITY GUIDE ─── */
 .cg-bairro-row { border-bottom: 1px solid #DDD9D3; }
@@ -2196,47 +2248,19 @@ function getTodayDayIndex() {
 
 function renderOverview() {
   const todayIdx = getTodayDayIndex();
-  const today = days[todayIdx];
   const dLeft = daysUntil();
   const tripStarted = new Date() >= new Date('2026-04-05');
 
-  const [todayDay, todayMonth] = today.date.split('/');
-  const todayMonthAbbr = MONTH_ABBR[todayMonth] || todayMonth;
-  const todaySummary = DAY_SUMMARIES[today.date] || '';
-  const todayCity = CITY_PT[today.city] || today.city;
-  const mainAct = today.activities[0];
-  const mainActName = typeof mainAct === 'object' ? mainAct.t : mainAct;
-
   let html = '';
 
+  // Countdown banner (before trip only)
   if (!tripStarted) {
-    // Before trip: countdown header
-    html += `<div class="s-row"><span>PARTIDA EM ${dLeft} DIAS</span><div class="s-dot"></div></div>
-    <div class="g-row">
-      <div class="g-label" style="align-items:center">Voo:</div>
-      <div class="g-value"><div class="g-sub">AMERICAN AIRLINES · GRU → HND</div><div class="g-num-md">AA 950</div></div>
+    html += `<div class="s-row" style="cursor:pointer" onclick="showFlightModal()">
+      <span>PARTIDA EM ${dLeft} DIAS · VER VOOS</span><div class="s-dot"></div>
     </div>`;
   }
 
-  // TODAY HERO
-  html += `<div class="s-row"><span>${tripStarted ? 'HOJE' : 'DIA 1'} · DIA ${todayIdx + 1} DE ${days.length} · ${todayCity.toUpperCase()}</span><div class="s-dot"></div></div>`;
-
-  html += `<div class="day-hero" onclick="openDayDetail(${todayIdx})">
-    <div class="day-hero-date">
-      <div class="day-hero-num">${todayDay}</div>
-      <div class="day-hero-month">${todayMonthAbbr}</div>
-      <div class="day-hero-wd">${today.weekday}</div>
-    </div>
-    <div class="day-hero-body">
-      <div class="day-hero-title">${today.title}</div>
-      ${todaySummary ? `<div class="day-hero-summary">${todaySummary}</div>` : ''}
-      <div class="day-hero-main">↳ ${mainActName}</div>
-    </div>
-  </div>`;
-
-  // FULL ITINERARY starting from today
-  html += `<div class="s-row"><span>PROGRAMAÇÃO COMPLETA</span><div class="s-dot"></div></div>`;
-
+  // Single unified list — current day is the big inline card
   days.forEach((d, i) => {
     const [day, month] = d.date.split('/');
     const monthAbbr = MONTH_ABBR[month] || month;
@@ -2244,31 +2268,102 @@ function renderOverview() {
     const summary = DAY_SUMMARIES[d.date] || '';
     const isToday = i === todayIdx;
     const isPast = i < todayIdx;
+    const mainAct = d.activities[0];
+    const mainActName = typeof mainAct === 'object' ? mainAct.t : (mainAct || '');
 
-    html += `<div class="dp-row ${isToday ? 'dp-today' : ''} ${isPast ? 'dp-past' : ''}" onclick="openDayDetail(${i})">
-      <div class="dp-date">
-        <div class="dp-day">${day}</div>
-        <div class="dp-month">${monthAbbr}</div>
-        <div class="dp-wd">${d.weekday}</div>
-      </div>
-      <div class="dp-content">
-        <div class="dp-title">${d.title}</div>
-        <div class="dp-city">${cityLabel}</div>
-        ${summary ? `<div class="dp-summary">${summary}</div>` : ''}
-      </div>
-      <div class="dp-arrow">›</div>
-    </div>`;
+    if (isToday) {
+      html += `<div class="day-hero" id="dp-current-day" onclick="openDayDetail(${i})">
+        <div class="day-hero-date">
+          <div class="day-hero-num">${day}</div>
+          <div class="day-hero-month">${monthAbbr}</div>
+          <div class="day-hero-wd">${d.weekday}</div>
+        </div>
+        <div class="day-hero-body">
+          <div class="day-hero-title">${d.title}</div>
+          ${summary ? `<div class="day-hero-summary">${summary}</div>` : ''}
+          <div class="day-hero-main">↳ ${mainActName}</div>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="dp-row ${isPast ? 'dp-past' : ''}" onclick="openDayDetail(${i})">
+        <div class="dp-date">
+          <div class="dp-day">${day}</div>
+          <div class="dp-month">${monthAbbr}</div>
+          <div class="dp-wd">${d.weekday}</div>
+        </div>
+        <div class="dp-content">
+          <div class="dp-title">${d.title}</div>
+          <div class="dp-city">${cityLabel}</div>
+          ${summary ? `<div class="dp-summary">${summary}</div>` : ''}
+        </div>
+        <div class="dp-arrow">›</div>
+      </div>`;
+    }
   });
 
   document.getElementById('overview-content').innerHTML = html;
 
-  // Scroll to today after render
-  if (tripStarted) {
-    setTimeout(() => {
-      const todayEl = document.querySelector('.dp-today');
-      if (todayEl) todayEl.scrollIntoView({ behavior:'smooth', block:'center' });
-    }, 100);
-  }
+  // Scroll current day into view
+  setTimeout(() => {
+    const el = document.getElementById('dp-current-day');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
+}
+
+// ═══════════════════════════════════════
+// FLIGHT MODAL
+// ═══════════════════════════════════════
+function showFlightModal() {
+  const FLIGHT_PEOPLE = ['Fabio','Fernanda','Joaquim','Luisa'];
+  const flightTickets = tickets.filter(t =>
+    /AA \d+|voo/i.test(t.name) && t.details
+  );
+
+  let html = '';
+  flightTickets.forEach(t => {
+    // Parse seats from details string like "Fabio 15B · Fernanda 15D · Joaquim 15C · Luisa 15E"
+    const seatMatches = [];
+    FLIGHT_PEOPLE.forEach(p => {
+      const re = new RegExp(p + '\\s+([A-Z0-9]+)', 'i');
+      const m = t.details.match(re);
+      if (m) seatMatches.push({ name: p, seat: m[1].toUpperCase() });
+    });
+
+    // Extract date + time info
+    const metaParts = t.details.split('·').map(s => s.trim()).filter(Boolean);
+    const datePart = metaParts[0] || '';
+    const timePart = metaParts[1] || '';
+
+    html += `<div class="flight-ticket">
+      <div class="flight-ticket-route">${t.name}</div>
+      <div class="flight-ticket-meta">${datePart}${timePart ? ' · ' + timePart : ''}</div>`;
+
+    if (seatMatches.length) {
+      html += `<div class="flight-seat-label">Assentos</div>
+      <div class="flight-ticket-seats">`;
+      seatMatches.forEach(s => {
+        html += `<div class="flight-seat" title="${s.name}">${s.name.slice(0,3).toUpperCase()} ${s.seat}</div>`;
+      });
+      html += `</div>`;
+    }
+
+    if (t.link) {
+      html += `<a href="${t.link}" target="_blank" rel="noopener" class="flight-ticket-link">Check-in / Detalhes →</a>`;
+    }
+
+    html += `</div>`;
+  });
+
+  if (!html) html = `<div style="padding:24px 20px;color:#888;font-size:13px">Nenhum voo encontrado.</div>`;
+
+  document.getElementById('flight-modal-body').innerHTML = html;
+  document.getElementById('flight-modal-overlay').classList.add('open');
+  document.getElementById('flight-modal').classList.add('open');
+}
+
+function closeFlightModal() {
+  document.getElementById('flight-modal-overlay').classList.remove('open');
+  document.getElementById('flight-modal').classList.remove('open');
 }
 
 // ═══════════════════════════════════════
@@ -2578,6 +2673,7 @@ function renderDayDetail(idx) {
     const link = (typeof a === 'object' && a.l) ? a.l : '';
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(text + ' Japan')}`;
     const isNavActivity = text.startsWith('Saída') || text.startsWith('Voo') || text.startsWith('Almoço rápido') || text.startsWith('Check-in') || text.startsWith('Check-out');
+    const isFlightActivity = text.startsWith('Voo');
 
     if (editMode) {
       const dayOptions = days.map((dd, di) => {
@@ -2601,12 +2697,13 @@ function renderDayDetail(idx) {
         </div>
       </div>`;
     } else {
-      html += `<div class="day-act-row">
+      html += `<div class="day-act-row" ${isFlightActivity ? 'onclick="showFlightModal()" style="cursor:pointer"' : ''}>
         <div class="day-act-time">${time}</div>
         <div class="day-act-name">
           <div class="day-act-title">${text}</div>
           ${desc ? `<div class="day-act-desc">${desc}</div>` : ''}
-          ${!isNavActivity ? `<div class="act-links">
+          ${isFlightActivity ? `<div class="act-links"><span class="act-link-btn" style="cursor:pointer">✈ Ver assentos e detalhes</span></div>` : ''}
+          ${!isNavActivity && !isFlightActivity ? `<div class="act-links">
             <a href="${mapsUrl}" target="_blank" rel="noopener" class="act-link-btn">🗺 Maps</a>
             ${link ? `<a href="${link}" target="_blank" rel="noopener" class="act-link-btn">🌐 Site</a>` : ''}
           </div>` : ''}
@@ -3112,5 +3209,16 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<!-- FLIGHT MODAL -->
+<div class="flight-modal-overlay" id="flight-modal-overlay" onclick="closeFlightModal()"></div>
+<div class="flight-modal" id="flight-modal">
+  <div class="flight-modal-handle"></div>
+  <div class="flight-modal-header">
+    <span class="flight-modal-title">Voos</span>
+    <button class="flight-modal-close" onclick="closeFlightModal()">×</button>
+  </div>
+  <div class="flight-modal-body" id="flight-modal-body"></div>
+</div>
 </body>
 </html>
