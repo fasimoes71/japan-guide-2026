@@ -717,8 +717,18 @@ body {
 .header-date { display: none; }
 .header-right { display: flex; align-items: center; gap: 14px; }
 
-/* Hamburger — oculto (mantido para compatibilidade) */
-.header-menu-btn { display: none; }
+/* Hamburger */
+.header-menu-btn {
+  background: none; border: none; cursor: pointer; padding: 8px 4px;
+  display: flex; flex-direction: column; justify-content: center; gap: 5px;
+}
+.header-menu-btn span {
+  display: block; width: 18px; height: 1.5px; background: #0A0A0A;
+  transition: transform 0.25s, opacity 0.25s; transform-origin: center;
+}
+.header-menu-btn.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.header-menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.header-menu-btn.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
 /* Nav sempre visível no header */
 .header-desktop-nav { display: none; }
@@ -1437,9 +1447,13 @@ textarea.sheet-input { resize: none; min-height: 80px; padding-top: 16px; }
 </div>
 
 <!-- VIEW 4: CIDADES -->
+<!-- VIEW: DICAS (separado) -->
+<div class="view" id="view-dicas">
+  <div id="dicas-content"></div>
+</div>
+
 <div class="view" id="view-cidades">
   <div class="subtabs" id="city-guide-tabs">
-    <button class="subtab" id="cg-tab-dicas" onclick="switchCityGuide('Dicas')">Dicas</button>
     <button class="subtab active" id="cg-tab-tokyo" onclick="switchCityGuide('Tokyo')">Tokyo</button>
     <button class="subtab" id="cg-tab-hakone" onclick="switchCityGuide('Hakone')">Hakone</button>
     <button class="subtab" id="cg-tab-kyoto" onclick="switchCityGuide('Kyoto')">Kyoto</button>
@@ -2113,34 +2127,47 @@ function switchView(name) {
   const viewEl = document.getElementById('view-' + name);
   if (viewEl) viewEl.classList.add('active');
 
-  // Sincronizar todos os navs — dicas aponta para cidades
-  const activeNav = name === 'cidades' && currentCityGuide === 'Dicas' ? 'dicas' : name;
   ['overview','cidades','dicas','reservas'].forEach(n => {
     const bnav = document.getElementById('bnav-' + n);
-    if (bnav) bnav.classList.toggle('active', n === activeNav);
+    if (bnav) bnav.classList.toggle('active', n === name);
     const dnav = document.getElementById('dnav-' + n);
-    if (dnav) dnav.classList.toggle('active', n === activeNav);
+    if (dnav) dnav.classList.toggle('active', n === name);
     const fmenu = document.getElementById('fmenu-' + n);
-    if (fmenu) fmenu.classList.toggle('active-nav', n === activeNav);
+    if (fmenu) fmenu.classList.toggle('active-nav', n === name);
   });
 
   if (name === 'overview') renderOverview();
   if (name === 'reservas') renderReservas(currentReservasTab);
   if (name === 'cidades') renderCidades();
+  if (name === 'dicas') renderDicasView();
 }
 
-function switchToDicas() {
-  switchView('cidades');
-  switchCityGuide('Dicas');
-  // Marcar Dicas como ativo nos navs
-  ['overview','cidades','dicas','reservas'].forEach(n => {
-    const bnav = document.getElementById('bnav-' + n);
-    if (bnav) bnav.classList.toggle('active', n === 'dicas');
-    const dnav = document.getElementById('dnav-' + n);
-    if (dnav) dnav.classList.toggle('active', n === 'dicas');
-    const fmenu = document.getElementById('fmenu-' + n);
-    if (fmenu) fmenu.classList.toggle('active-nav', n === 'dicas');
+function switchToDicas() { switchView('dicas'); }
+
+function renderDicasView() {
+  const container = document.getElementById('dicas-content');
+  if (!container) return;
+  let html = '';
+  DICAS_DATA.forEach(section => {
+    html += `<div class="dicas-section">
+      <div class="dicas-section-header" onclick="toggleDicasSection('${section.id}')">
+        <span class="dicas-section-emoji">${section.emoji}</span>
+        <span class="dicas-section-title">${section.title}</span>
+        <span class="dicas-section-chevron" id="dicas-chevron-${section.id}">›</span>
+      </div>
+      <div class="dicas-section-body" id="dicas-body-${section.id}" style="display:none">`;
+    section.items.forEach(item => {
+      const bodyHtml = item.body ? item.body.replace(/\n/g, '<br>') : '';
+      html += `<div class="dicas-item">
+        <div class="dicas-item-heading">${item.heading}${item.link ? `<a href="${item.link}" target="_blank" rel="noopener" class="dicas-item-link">↗</a>` : ''}</div>
+        ${bodyHtml ? `<div class="dicas-item-body">${bodyHtml}</div>` : ''}
+      </div>`;
+    });
+    html += `</div></div>`;
   });
+  container.innerHTML = html;
+  // Auto-expand primeiro item
+  if (DICAS_DATA.length) toggleDicasSection(DICAS_DATA[0].id);
 }
 
 function toggleFullMenu() {
@@ -2631,13 +2658,10 @@ let currentCityCat = 'bairros';
 
 function switchCityGuide(city) {
   currentCityGuide = city;
-  ['Dicas','Tokyo','Hakone','Kyoto','Nara','Osaka'].forEach(c => {
+  ['Tokyo','Hakone','Kyoto','Nara','Osaka'].forEach(c => {
     const btn = document.getElementById('cg-tab-' + c.toLowerCase());
     if (btn) btn.classList.toggle('active', c === city);
   });
-  // Show/hide category tabs row
-  const catTabs = document.getElementById('city-cat-tabs');
-  if (catTabs) catTabs.style.display = city === 'Dicas' ? 'none' : '';
   renderCidades();
 }
 
