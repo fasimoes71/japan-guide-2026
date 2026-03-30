@@ -833,6 +833,7 @@ body {
 /* ─── BOTTOM NAV ─── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+  -webkit-transform: translateZ(0); transform: translateZ(0);
   background: #F0EDE8; border-top: 1px solid #DDD9D3;
   display: flex; align-items: flex-start; justify-content: space-around;
   padding: 10px 8px;
@@ -870,6 +871,7 @@ body {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
   padding: 20px 20px 22px;
+  pointer-events: none;
 }
 .overview-hero-title {
   font-size: 32px; font-weight: 400; letter-spacing: -1px;
@@ -2203,6 +2205,13 @@ function statusLabel(s) {
 // ═══════════════════════════════════════
 function switchView(name) {
   currentView = name;
+  // Close fullpage menu if open
+  const menu = document.getElementById('fullpage-menu');
+  const menuBtn = document.getElementById('header-menu-btn');
+  if (menu && menu.classList.contains('open')) {
+    menu.classList.remove('open');
+    if (menuBtn) menuBtn.classList.remove('open');
+  }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const viewEl = document.getElementById('view-' + name);
   if (viewEl) viewEl.classList.add('active');
