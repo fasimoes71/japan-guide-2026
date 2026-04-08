@@ -1,4 +1,4 @@
-const CACHE = 'japao-2026-v3';
+const CACHE = 'japao-2026-v4';
 const ASSETS = [
   '/', '/index.html',
   'fotos/japan/tokyo home.jpg',
