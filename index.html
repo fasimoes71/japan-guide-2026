@@ -945,7 +945,7 @@ body {
 .b-detail a { color: #0A0A0A; }
 
 /* ─── MAP ITINERARY ─── */
-#map-container { height: 280px; border-bottom: 1px solid #DDD9D3; }
+#map-container { height: 320px; border-bottom: 1px solid #DDD9D3; overflow: hidden; }
 .mi-label {
   padding: 10px 14px; font-size: 10px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 1.5px; color: #888;
@@ -2415,24 +2415,77 @@ function closeFlightModal() {
 // MAP VIEW
 // ═══════════════════════════════════════
 function renderMapView() {
-  // Init Leaflet once
-  if (!mapInstance) {
-    mapInstance = L.map('map-container', { zoomControl: false }).setView([35.5, 136.5], 6);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap, © CARTO',
-      maxZoom: 18
-    }).addTo(mapInstance);
+  // Geometric SVG route map
+  const mapEl = document.getElementById('map-container');
+  if (!mapEl._svgDone) {
+    mapEl.style.background = '#F0EDE8';
+    mapEl.innerHTML = `
+<svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+  <defs>
+    <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 z" fill="#0A0A0A"/>
+    </marker>
+  </defs>
 
-    MAP_POINTS.forEach(p => {
-      const icon = L.divIcon({
-        html: `<div style="width:10px;height:10px;background:${p.color};border:2px solid #fff;border-radius:50%"></div>`,
-        iconSize: [10, 10], className: ''
-      });
-      L.marker([p.lat, p.lng], { icon }).addTo(mapInstance)
-        .bindTooltip(p.name, { permanent: false, direction: 'top' });
-    });
-  } else {
-    setTimeout(() => mapInstance.invalidateSize(), 100);
+  <!-- RETURN FLIGHT (dashed, background) -->
+  <line x1="318" y1="72" x2="52" y2="200" stroke="#C8C3BC" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- MAIN ROUTE -->
+  <!-- Tokyo → Hakone (diagonal) -->
+  <line x1="318" y1="72" x2="240" y2="140" stroke="#0A0A0A" stroke-width="2.5"/>
+  <!-- Hakone → Kyoto (diagonal) -->
+  <line x1="240" y1="140" x2="148" y2="200" stroke="#0A0A0A" stroke-width="2.5"/>
+  <!-- Kyoto → Osaka (horizontal) -->
+  <line x1="148" y1="200" x2="52" y2="200" stroke="#0A0A0A" stroke-width="2.5"/>
+  <!-- Kyoto → Nara (spur, dashed) -->
+  <line x1="148" y1="200" x2="178" y2="268" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- TRANSPORT LABELS -->
+  <text transform="translate(286,96) rotate(-42)" font-family="Barlow,sans-serif" font-size="8" font-weight="600" fill="#888" letter-spacing="0.5">ROMANCECAR</text>
+  <text transform="translate(188,162) rotate(-37)" font-family="Barlow,sans-serif" font-size="8" font-weight="600" fill="#888" letter-spacing="0.5">SHINKANSEN</text>
+  <text x="82" y="193" font-family="Barlow,sans-serif" font-size="8" font-weight="600" fill="#888" letter-spacing="0.5">KYO-TRAIN</text>
+  <text x="272" y="148" font-family="Barlow,sans-serif" font-size="8" fill="#AAA" letter-spacing="0.5">vol. AA168</text>
+
+  <!-- CITY NODES -->
+  <!-- TOKYO -->
+  <circle cx="318" cy="72" r="9" fill="#0A0A0A"/>
+  <circle cx="318" cy="72" r="5" fill="#F0EDE8"/>
+  <text x="332" y="68" font-family="Barlow,sans-serif" font-size="12" font-weight="900" fill="#0A0A0A" letter-spacing="0.5">TÓQUIO</text>
+  <text x="332" y="80" font-family="Barlow,sans-serif" font-size="9" fill="#888">07–13 / 24–25 ABR</text>
+
+  <!-- HAKONE -->
+  <circle cx="240" cy="140" r="9" fill="#0A0A0A"/>
+  <circle cx="240" cy="140" r="5" fill="#F0EDE8"/>
+  <text x="254" y="136" font-family="Barlow,sans-serif" font-size="12" font-weight="900" fill="#0A0A0A" letter-spacing="0.5">HAKONE</text>
+  <text x="254" y="148" font-family="Barlow,sans-serif" font-size="9" fill="#888">13–14 ABR</text>
+
+  <!-- KYOTO -->
+  <circle cx="148" cy="200" r="9" fill="#0A0A0A"/>
+  <circle cx="148" cy="200" r="5" fill="#F0EDE8"/>
+  <text x="156" y="188" font-family="Barlow,sans-serif" font-size="12" font-weight="900" fill="#0A0A0A" letter-spacing="0.5">KYOTO</text>
+  <text x="156" y="200" font-family="Barlow,sans-serif" font-size="9" fill="#888">14–19 ABR</text>
+
+  <!-- OSAKA -->
+  <circle cx="52" cy="200" r="9" fill="#0A0A0A"/>
+  <circle cx="52" cy="200" r="5" fill="#F0EDE8"/>
+  <text x="16" y="188" font-family="Barlow,sans-serif" font-size="12" font-weight="900" fill="#0A0A0A" letter-spacing="0.5">OSAKA</text>
+  <text x="16" y="200" font-family="Barlow,sans-serif" font-size="9" fill="#888">19–24 ABR</text>
+
+  <!-- NARA -->
+  <circle cx="178" cy="268" r="6" fill="#888"/>
+  <circle cx="178" cy="268" r="3" fill="#F0EDE8"/>
+  <text x="188" y="264" font-family="Barlow,sans-serif" font-size="10" font-weight="700" fill="#888" letter-spacing="0.5">NARA</text>
+  <text x="188" y="275" font-family="Barlow,sans-serif" font-size="8" fill="#AAA">bate-volta · 21 ABR</text>
+
+  <!-- LEGEND -->
+  <line x1="16" y1="300" x2="36" y2="300" stroke="#0A0A0A" stroke-width="2"/>
+  <text x="40" y="304" font-family="Barlow,sans-serif" font-size="8" fill="#888">rota principal</text>
+  <line x1="100" y1="300" x2="120" y2="300" stroke="#C8C3BC" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="124" y="304" font-family="Barlow,sans-serif" font-size="8" fill="#888">voo de volta</text>
+  <line x1="188" y1="300" x2="208" y2="300" stroke="#888" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="212" y="304" font-family="Barlow,sans-serif" font-size="8" fill="#888">bate-volta</text>
+</svg>`;
+    mapEl._svgDone = true;
   }
 
   // Render itinerary grid
