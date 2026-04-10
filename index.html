@@ -2734,6 +2734,14 @@ function renderDayDetail(idx) {
     </div>`;
   }
 
+  // DICA DO DIA — shown at top, below summary
+  if (d.tip) {
+    html += `<div class="day-tip-row">
+      <div class="day-tip-label">💡 DICA DO DIA</div>
+      <div class="day-tip-text">${d.tip}</div>
+    </div>`;
+  }
+
   // Get transit data for this day
   const transit = DAY_TRANSIT[d.date];
   
@@ -2848,12 +2856,7 @@ function renderDayDetail(idx) {
     </div>`;
   }
 
-  if (d.tip) {
-    html += `<div class="day-tip-row" style="margin-top:8px">
-      <div class="day-tip-label">DICA DO DIA</div>
-      <div class="day-tip-text">${d.tip}</div>
-    </div>`;
-  }
+  // tip moved to top
 
   document.getElementById('day-slide-content').innerHTML = html;
   document.getElementById('day-slide').scrollTop = 0;
